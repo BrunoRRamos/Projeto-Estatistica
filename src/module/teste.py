@@ -3,28 +3,18 @@ import statsmodels.api as sm
 import matplotlib.pylab as plt
 
 # Carregar os dados
-df = pd.read_csv('../data/College-db.csv', sep=';')
+df = pd.read_csv('../data/pinguins.csv', sep=';')
 
-# Remover a coluna "Private" se necessário (caso ela não seja uma variável preditora)
-if "Private" in df.columns:
-    df = df.drop(columns=["Private"])
+df = df.drop(columns=["especie", "ilha", "comprimento_bico", "sexo", "ano"])
+df['profundidade_bico'] = df['profundidade_bico'].str.replace(",", ".").astype(float)
+df = df.dropna()
 
-if "Dummy" in df.columns:
-    df = df.drop(columns=["Dummy"])
-
-# Substituindo as "," por "." na coluna "perc.alumni"
-df['perc.alumni'] = df['perc.alumni'].str.replace(",", ".").astype(float)
-
-# Substituindo "Yes", "No" por 1 e 0 na coluna "Apps"
-df['Apps'] = df['Apps'].replace('Yes', 1)
-df['Apps'] = df['Apps'].replace('No', 0)
-
-# Correlação entre as variáveis
+print(df.info())
+print(df.head())
 print(df.corr())
 
-# Separar variáveis preditoras (X) e variável resposta (y)
-X = sm.add_constant(df.drop(columns=["Apps"]))
-y = df['Apps']
+X = sm.add_constant(df.drop(columns=["comprimento_nadadeira"]))
+y = df["comprimento_nadadeira"]
 
 model = sm.OLS(y, X)
 result = model.fit()
